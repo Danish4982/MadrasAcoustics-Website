@@ -14,12 +14,18 @@ const sendQuery = async (request: Request, response: Response) => {
 
         // Create transporter
         const transporter = nodemailer.createTransport({
-            service: "Gmail",
+            host: "smtpout.secureserver.net", 
+            port: 465,
+            secure: true,
             auth: {
                 user: process.env.BE_EMAIL,
-                pass: process.env.BE_PASSWORD, // Ensure this is correct
+                pass: process.env.BE_PASSWORD
             },
+            tls: {
+                rejectUnauthorized: false
+            }
         });
+        
 
         let mailOptions;
 
@@ -49,12 +55,13 @@ const sendQuery = async (request: Request, response: Response) => {
        
 
         await transporter.sendMail(mailOptions);
-
+        console.log("Mail sended successfully")
         return response.status(200).json({ message: "Email sent successfully!" });
 
     } catch (error: any) {
         
         if (!response.headersSent) {
+            console.log(error)
             return response.status(500).json({ error: "Failed to send email. Check server logs for details." });
         }
     }
